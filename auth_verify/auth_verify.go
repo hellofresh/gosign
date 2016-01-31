@@ -52,7 +52,9 @@ func convertPkix(key interface{}) (*rsa.PublicKey, error) {
 	return re.(*rsa.PublicKey), nil
 }
 
+// santise path
 func checkPath(base_path string, header_path string) (string, error) {
+	//need to remove special char
 	abs_base_path, err := filepath.Abs(base_path)
 	if err != nil {
 		return "", fmt.Errorf("Error absolute basedir path :'%v'", err)
