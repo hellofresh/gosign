@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"path/filepath"
 	"strings"
 
 	"github.com/ianmcmahon/encoding_ssh"
@@ -51,10 +52,36 @@ func convertPkix(key interface{}) (*rsa.PublicKey, error) {
 	return re.(*rsa.PublicKey), nil
 }
 
-func ReadPublicKey(base_path string, path string) (*rsa.PublicKey, error) {
-	//TODO: Must santize input for path
+func checkPath(base_path string, header_path string) (string, error) {
+	abs_base_path, err := filepath.Abs(base_path)
+	if err != nil {
+		return "", fmt.Errorf("Error absolute basedir path :'%v'", err)
+	}
 
-	bytes, err := ioutil.ReadFile(base_path + path)
+	xpath, err := filepath.Abs(filepath.Join(abs_base_path, header_path))
+	if err != nil {
+		return "", fmt.Errorf("Error absolute header path :'%v'", err)
+	}
+
+	rel, err := filepath.Rel(abs_base_path, xpath)
+	if err != nil {
+		return "", fmt.Errorf("Error rel path :'%v'", err)
+	}
+	abspath := filepath.Join(abs_base_path, rel)
+
+	if strings.Contains(abspath, abs_base_path) == false {
+		return "", fmt.Errorf("Error base path in join. Probably security issue")
+	}
+
+	return abspath, nil
+}
+
+func ReadPublicKey(base_path string, header_path string) (*rsa.PublicKey, error) {
+	abspath, err := checkPath(base_path, header_path)
+	if err != nil {
+		return nil, fmt.Errorf("Failed to check path to key :'%v'", err)
+	}
+	bytes, err := ioutil.ReadFile(abspath)
 	if err != nil {
 		return nil, fmt.Errorf("Failed to read public key :'%v'", err)
 	}
