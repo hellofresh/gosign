@@ -18,13 +18,22 @@ import (
 // key=value,key2=value2
 func ParseCommaKeyValue(entireString string) (map[string]string, error) {
 	m := make(map[string]string)
-	var keyValueSlice []string
-	for _, keyValueString := range strings.Split(entireString, ",") {
-		keyValueSlice = strings.Split(keyValueString, "=")
-		// strip "
-		m[keyValueSlice[0]] = strings.Trim(keyValueSlice[1], "\"")
+	if len(entireString) > 1 {
+		var keyValueSlice []string
+		for _, keyValueString := range strings.Split(entireString, ",") {
+
+			keyValueSlice = strings.Split(keyValueString, "=")
+			if len(keyValueSlice) != 2 {
+				return m, nil
+			} else {
+				// strip "
+				m[keyValueSlice[0]] = strings.Trim(keyValueSlice[1], "\"")
+			}
+		}
+		return m, nil
+	} else {
+		return m, nil
 	}
-	return m, nil
 }
 
 // Takes
