@@ -37,7 +37,7 @@ func ParseCommaKeyValue(entireString string) (map[string]string, error) {
 	}
 }
 
-// Takes
+
 func convertPkix(key interface{}) (*rsa.PublicKey, error) {
 	// Marshal to ASN.1 DER encoding
 	pkix, err := x509.MarshalPKIXPublicKey(key)
@@ -99,7 +99,7 @@ func ReadPublicKey(base_path string, header_path string) (*rsa.PublicKey, error)
 	return public_key, nil
 }
 
-// The CreateAuthorizationHeader returns the Authorization header for the give request.
+// The CreateAuthorizationHeader returns the Authorization header for the given request.
 // Only support SDCsignature for now
 func ParseAuthorizationHeader(headers http.Header, isMantaRequest bool) (map[string]string, error) {
 	//"Signature keyId='/user_test/keys/user_test',algorithm='rsa-sha256' FOUmNhldoFHsit6QkTedZDeOUbIcIY+1cgZAm7HYjx3B1r/r9826j0r18v1kW874uX0oLNhh33r1+pXlUgAZ+xkmelaFhh9fk8tsv3JIJGKZnF0pJjDs0oQ5mYT0W9TmEF6WHE3bhO2ipM1m1pCdLyFjTe0LTDJs4VPs0q+3u4MD4TUZq24TF+9XlHeEkVkUHAqhXqSTw2FXi9XheQonns3V0BQbitulkcIOkjHlp+IHedCbaD7l6tLawkiJaPIKZUWH4ugvnPwUhVAQDDxkJ9KGlCb2JWJArspCcI/dHqOwKDn1O+4s0t+pQqKlKl93YQSEaerZosaXdT8ux3vVXg=="
@@ -163,7 +163,7 @@ func VerifySignature(public_key *rsa.PublicKey, hashFunc crypto.Hash, signing st
 	}
 	err = rsa.VerifyPKCS1v15(public_key, hashFunc, digest, []byte(decoded_sign))
 	if err != nil {
-		return false, fmt.Errorf("An error occurred while signing the key: %s", err)
+		return false, fmt.Errorf("Invalid signature. Error: %s", err)
 	} else {
 		return true, nil
 	}
