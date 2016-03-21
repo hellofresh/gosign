@@ -17,6 +17,7 @@ import (
 
 // Parse string Comma key value and return map
 // key=value,key2=value2
+// FIXME: why do we need "error" in return value? It's always nil
 func ParseCommaKeyValue(entireString string) (map[string]string, error) {
 	m := make(map[string]string)
 	if len(entireString) > 1 {
