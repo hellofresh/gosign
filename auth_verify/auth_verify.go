@@ -22,10 +22,12 @@ func ParseCommaKeyValue(entireString string) (map[string]string, error) {
 	if len(entireString) > 1 {
 		var keyValueSlice []string
 		for _, keyValueString := range strings.Split(entireString, ",") {
-
+			if len(keyValueString) == 0 {
+				return nil, fmt.Errorf("The comma string is formated incorrect. '%s'", entireString)
+			}
 			keyValueSlice = strings.Split(keyValueString, "=")
 			if len(keyValueSlice) != 2 {
-				return m, nil
+				return nil, fmt.Errorf("The key,value string is formated incorrect. '%s'", keyValueSlice)
 			} else {
 				// strip "
 				m[keyValueSlice[0]] = strings.Trim(keyValueSlice[1], "\"")
@@ -36,7 +38,6 @@ func ParseCommaKeyValue(entireString string) (map[string]string, error) {
 		return m, nil
 	}
 }
-
 
 func convertPkix(key interface{}) (*rsa.PublicKey, error) {
 	// Marshal to ASN.1 DER encoding
