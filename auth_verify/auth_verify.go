@@ -8,9 +8,11 @@ import (
 	"encoding/base64"
 	"fmt"
 	"io/ioutil"
+	"math"
 	"net/http"
 	"path/filepath"
 	"strings"
+	"time"
 
 	"github.com/ianmcmahon/encoding_ssh"
 )
@@ -140,7 +142,18 @@ func Verify(base_key_dir string, headers http.Header, isMantaRequest bool) (bool
 	hashFunc := getHashFunction(m["algorithm"])
 
 	if date, ok := headers["Date"]; ok {
-		// TODO: Verify date formant and that its lagging or passing by 300 sec
+		clockSkew := 300.00
+		now := time.Now()
+		requestTime, err := time.Parse(time.RFC1123, date[0])
+		if err != nil {
+			return false, fmt.Errorf("%v", err)
+		}
+
+		// Check that we are in the valid time span
+		if math.Abs(float64(now.Sub(requestTime)/time.Second)) > clockSkew {
+			return false, fmt.Errorf("Clock out of sync")
+		}
+
 		access, err := VerifySignature(my_key, hashFunc, date[0], m["sig"])
 		if err != nil {
 			return false, fmt.Errorf("%v", err)
