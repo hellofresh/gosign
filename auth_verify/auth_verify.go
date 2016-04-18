@@ -14,8 +14,12 @@ import (
 	"strings"
 	"time"
 
+	"github.com/bcampbell/fuzzytime"
 	"github.com/ianmcmahon/encoding_ssh"
 )
+
+const ISO_FORMAT = "2006-01-02T15:04:05-07:00"
+const ISO_FORMAT_NO_SECONDS = "2006-01-02T15:04-07:00"
 
 // Parse string Comma key value and return map
 // key=value,key2=value2
@@ -144,7 +148,7 @@ func Verify(base_key_dir string, headers http.Header, isMantaRequest bool) (bool
 	if date, ok := headers["Date"]; ok {
 		clockSkew := 300.00
 		now := time.Now()
-		requestTime, err := time.Parse(time.RFC1123, date[0])
+		requestTime, err := getTimeFromHeader(date[0])
 		if err != nil {
 			return false, fmt.Errorf("%v", err)
 		}
@@ -196,4 +200,18 @@ func getHashFunction(algorithm string) (hashFunc crypto.Hash) {
 		hashFunc = crypto.SHA256
 	}
 	return
+}
+
+// Helper method to parse date in unknown format
+func getTimeFromHeader(date string) (time.Time, error) {
+	fuz, _, err := fuzzytime.Extract(date)
+	if err != nil {
+		return time.Time{}, err
+	}
+
+	if fuz.Time.HasSecond() {
+		return time.Parse(ISO_FORMAT, fuz.ISOFormat())
+	} else {
+		return time.Parse(ISO_FORMAT_NO_SECONDS, fuz.ISOFormat())
+	}
 }
