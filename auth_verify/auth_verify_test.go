@@ -67,3 +67,22 @@ func (s *TestSuite) TestReadPublicKey(c *C) {
 	c.Check(key, IsNil)
 	c.Check(err.Error(), Matches, "(Failed to read public key).*?")
 }
+
+func (s *TestSuite) TestgetTimeFromHeader(c *C) {
+	var (
+		err   error
+		dates []string = []string{
+			"Friday, 15-Apr-16 10:27:35 CEST",
+			"Fri, 15 Apr 2016 10:27:35 CEST",
+			"Fri, 15 Apr 2016 10:27:35 +0200",
+			"15 Apr 16 10:27 CEST",
+			"15 Apr 16 10:27 +0200",
+		}
+	)
+
+	for _, date := range dates {
+		_, err = getTimeFromHeader(date)
+
+		c.Check(err, IsNil)
+	}
+}

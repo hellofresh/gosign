@@ -2,6 +2,7 @@ export GOPATH=$(CURDIR)/.go
 
 dep-update:
 	go get -u "github.com/ianmcmahon/encoding_ssh"
+	go get -u "github.com/bcampbell/fuzzytime"
 	go get -u "gopkg.in/check.v1"
 
 fmt:
